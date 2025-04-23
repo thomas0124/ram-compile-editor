@@ -342,7 +342,7 @@ HALT         ; Stop execution
                 <code>JZERO label</code>: Jump to the label if r0 = 0
               </li>
               <li>
-                <code>JGTZ label</code>: Jump to the label if r0 > 0
+                <code>JGTZ label</code>: Jump to the label if r0 &gt; 0
               </li>
               <li>
                 <code>READ x</code>: Read from input to memory
@@ -377,7 +377,7 @@ HALT         ; Stop execution
                 that operates on these registers.
               </p>
               <p>
-                RAM is a simple but powerful model that can simulate any algorithm. It's often used in algorithm
+                RAM is a simple but powerful model that can simulate any algorithm. It&apos;s often used in algorithm
                 analysis and computational complexity theory to measure the efficiency of algorithms.
               </p>
               <p>
