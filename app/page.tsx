@@ -15,8 +15,6 @@ import { OnMount } from "@monaco-editor/react"
 
 export default function Home() {
   const [code, setCode] = useState(`; Example RAM program to calculate factorial
-; Input: n
-; Output: n!
 
 READ 1       ; Read input into r1
 LOAD 1       ; Load r1 into r0
