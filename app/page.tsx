@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RAMCompiler } from "@/lib/ram-compiler"
-import { Play, Pause, RotateCcw, StepForward } from "lucide-react"
+import { Play, Pause, RotateCcw, StepForward } from 'lucide-react'
 import { Slider } from "@/components/ui/slider"
 import { editor } from "monaco-editor"
 
@@ -50,12 +50,80 @@ HALT         ; Stop execution
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
-  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
-    editorRef.current = editor
+
+  // Monaco Editorの設定
+  function setupMonacoEditor(monaco: any) {
+    // RAM言語の登録
+    monaco.languages.register({ id: "RAMLanguage" })
+    
+    // トークンプロバイダーの設定
+    monaco.languages.setMonarchTokensProvider("RAMLanguage", {
+      tokenizer: {
+        root: [
+          // 命令ごとに異なるトークンタイプを割り当て
+          [/^\s*LOAD/, 'instruction.load'],
+          [/^\s*STORE/, 'instruction.store'],
+          [/^\s*ADD/, 'instruction.arithmetic'],
+          [/^\s*SUB/, 'instruction.arithmetic'],
+          [/^\s*MULT/, 'instruction.arithmetic'],
+          [/^\s*DIV/, 'instruction.arithmetic'],
+          [/^\s*JUMP/, 'instruction.jump'],
+          [/^\s*JZERO/, 'instruction.conditional'],
+          [/^\s*JGTZ/, 'instruction.conditional'],
+          [/^\s*SJ/, 'instruction.special'],
+          [/^\s*READ/, 'instruction.io'],
+          [/^\s*WRITE/, 'instruction.io'],
+          [/^\s*HALT/, 'instruction.control'],
+          [/^[a-zA-Z][a-zA-Z0-9]*:/, 'label'],
+          [/;.*$/, 'comment'],
+          [/=\d+/, 'immediate'],
+          [/\*\d+/, 'indirect'],
+          [/\b\d+\b/, 'number'],
+        ],
+      },
+    })
+
+    // カスタムテーマの定義
+    monaco.editor.defineTheme('RAMTheme', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'comment', foreground: '6A9955' },
+        { token: 'instruction.load', foreground: '569CD6', fontStyle: 'bold' },
+        { token: 'instruction.store', foreground: '4EC9B0', fontStyle: 'bold' },
+        { token: 'instruction.arithmetic', foreground: 'C586C0', fontStyle: 'bold' },
+        { token: 'instruction.jump', foreground: 'DCDCAA', fontStyle: 'bold' },
+        { token: 'instruction.conditional', foreground: 'D7BA7D', fontStyle: 'bold' },
+        { token: 'instruction.special', foreground: 'CE9178', fontStyle: 'bold' },
+        { token: 'instruction.io', foreground: '4FC1FF', fontStyle: 'bold' },
+        { token: 'instruction.control', foreground: 'FF5252', fontStyle: 'bold' },
+        { token: 'label', foreground: 'FFFF00' },
+        { token: 'immediate', foreground: 'B5CEA8' },
+        { token: 'indirect', foreground: 'FF8C00' },
+        { token: 'number', foreground: 'B5CEA8' },
+      ],
+      colors: {
+        'editor.foreground': '#FFFFFF',
+        'editor.background': '#1E1E1E',
+        'editor.lineHighlightBackground': '#2D2D30',
+        'editorCursor.foreground': '#AEAFAD',
+        'editor.selectionBackground': '#264F78',
+        'editor.inactiveSelectionBackground': '#3A3D41',
+      }
+    })
   }
+
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: any) => {
+    editorRef.current = editor
+    setupMonacoEditor(monaco)
+    monaco.editor.setModelLanguage(editor.getModel()!, "RAMLanguage")
+    editor.updateOptions({ theme: "RAMTheme" })
+  }
+
   const clearConsole = () => {
     setConsoleOutput([])
   }
+
   const initializeRAM = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
@@ -190,7 +258,8 @@ HALT         ; Stop execution
               <div className="h-[500px] border rounded-md overflow-hidden">
                 <Editor
                   height="100%"
-                  defaultLanguage="plaintext"
+                  defaultLanguage="RAMLanguage"
+                  theme="RAMTheme"
                   value={code}
                   onChange={(value) => setCode(value || "")}
                   onMount={handleEditorDidMount}
@@ -199,6 +268,9 @@ HALT         ; Stop execution
                     lineNumbers: "on",
                     glyphMargin: true,
                     scrollBeyondLastLine: false,
+                  }}
+                  beforeMount={(monaco) => {
+                    setupMonacoEditor(monaco)
                   }}
                 />
               </div>
@@ -246,6 +318,7 @@ HALT         ; Stop execution
           </Card>
         </div>
 
+        {/* 残りのコードは変更なし */}
         <div className="space-y-4">
           <Card className="p-4">
             <div className="flex items-center justify-between mb-2">
@@ -312,6 +385,7 @@ HALT         ; Stop execution
             <TabsTrigger value="about">About RAM</TabsTrigger>
           </TabsList>
           <TabsContent value="instructions" className="space-y-2">
+            {/* 残りのコードは変更なし */}
             <h3 className="text-lg font-semibold">RAM Instructions</h3>
             <ul className="list-disc pl-5 space-y-1">
               <li>

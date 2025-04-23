@@ -122,6 +122,16 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.current-line-highlight {
+  background-color: rgba(173, 216, 230, 0.2);
+}
+
+.current-line-glyph {
+  background-color: #007acc;
+  width: 4px !important;
+  margin-left: 3px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
