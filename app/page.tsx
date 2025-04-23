@@ -144,12 +144,10 @@ HALT         ; Stop execution
   const updateEditorLine = () => {
     if (!editorRef.current || !ramRef.current) return
 
-    // Clear previous decorations
     if (decorationsRef.current) {
       decorationsRef.current.clear()
     }
 
-    // Add new decoration for current line
     if (ramRef.current.code_step >= 0 && !ramRef.current.finish_flg) {
       decorationsRef.current = editorRef.current.createDecorationsCollection([
         {
