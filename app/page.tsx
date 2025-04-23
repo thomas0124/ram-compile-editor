@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RAMCompiler } from "@/lib/ram-compiler"
 import { Play, Pause, RotateCcw, StepForward } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
+import { editor } from "monaco-editor"
 
 export default function Home() {
   const [code, setCode] = useState(`; Example RAM program to calculate factorial
@@ -46,24 +47,20 @@ HALT         ; Stop execution
   const [speed, setSpeed] = useState(100)
   const [currentLine, setCurrentLine] = useState(-1)
   const ramRef = useRef<RAMCompiler | null>(null)
-  const editorRef = useRef<any>(null)
-  const decorationsRef = useRef<any>(null)
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+  const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
-
-  const handleEditorDidMount = (editor: any) => {
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
     editorRef.current = editor
   }
-
   const clearConsole = () => {
     setConsoleOutput([])
   }
-
   const initializeRAM = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
-    }
-
+    }  
     setIsRunning(false)
     setCurrentLine(-1)
     clearConsole()

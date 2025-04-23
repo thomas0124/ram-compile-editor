@@ -49,8 +49,6 @@ type RAMCompilerOptions = {
         }
         this.code[i] = code_one
       }
-  
-      this.show("RAM compiler is ready")
     }
   
     memorySET(idx: number, value: number) {
@@ -101,13 +99,9 @@ type RAMCompilerOptions = {
         return
       }
   
-      let code_one = this.code[this.code_step]
-      code_one = code_one.replace(/^\s+/, "")
-      code_one = code_one.replace(/;.*/, "")
-      code_one = code_one.replace(/\s+$/, "")
-  
-      let [command, ...args] = code_one.split(" ")
-      args = args.join("").split(",")
+      const code_one = this.code[this.code_step].replace(/^\s+/, "").replace(/;.*/, "").replace(/\s+$/, "");
+      const [command, ...argsArray] = code_one.split(" ");
+      const args = argsArray.join("").split(",");
   
       switch (command) {
         case "LOAD":
