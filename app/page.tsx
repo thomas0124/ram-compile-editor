@@ -10,6 +10,8 @@ import { RAMCompiler } from "@/lib/ram-compiler"
 import { Play, Pause, RotateCcw, StepForward } from 'lucide-react'
 import { Slider } from "@/components/ui/slider"
 import { editor } from "monaco-editor"
+import type Monaco from "monaco-editor"
+import { OnMount } from "@monaco-editor/react"
 
 export default function Home() {
   const [code, setCode] = useState(`; Example RAM program to calculate factorial
@@ -51,16 +53,11 @@ HALT         ; Stop execution
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Monaco Editorの設定
-  function setupMonacoEditor(monaco: any) {
-    // RAM言語の登録
+  function setupMonacoEditor(monaco: typeof Monaco) {
     monaco.languages.register({ id: "RAMLanguage" })
-    
-    // トークンプロバイダーの設定
     monaco.languages.setMonarchTokensProvider("RAMLanguage", {
       tokenizer: {
         root: [
-          // 命令ごとに異なるトークンタイプを割り当て
           [/^\s*LOAD/, 'instruction.load'],
           [/^\s*STORE/, 'instruction.store'],
           [/^\s*ADD/, 'instruction.arithmetic'],
@@ -82,8 +79,6 @@ HALT         ; Stop execution
         ],
       },
     })
-
-    // カスタムテーマの定義
     monaco.editor.defineTheme('RAMTheme', {
       base: 'vs-dark',
       inherit: true,
@@ -113,7 +108,7 @@ HALT         ; Stop execution
     })
   }
 
-  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: any) => {
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor
     setupMonacoEditor(monaco)
     monaco.editor.setModelLanguage(editor.getModel()!, "RAMLanguage")
@@ -317,8 +312,6 @@ HALT         ; Stop execution
             </div>
           </Card>
         </div>
-
-        {/* 残りのコードは変更なし */}
         <div className="space-y-4">
           <Card className="p-4">
             <div className="flex items-center justify-between mb-2">
